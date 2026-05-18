@@ -1,6 +1,6 @@
 ---
 name: brand-ux-guidelines
-description: Enforces project-specific brand guidelines, typography, and UX patterns for Zonacrono.
+description: Enforces project-specific brand guidelines, typography, and UX patterns for ZonaCrono.
 triggers:
   - "apply brand styles"
   - "check ux guidelines"
@@ -9,12 +9,12 @@ triggers:
   - "use brand colors"
 ---
 
-# Zonacrono Brand & UX Guidelines
+# ZonaCrono Brand & UX Guidelines
 
-This skill ensures that all UI/UX developments align with the unique "Mechanical Industrial" brand identity of Zonacrono.
+This skill ensures that all UI/UX developments align with the unique "Mechanical Industrial" brand identity of ZonaCrono.
 
 ## Brand Identity: Mechanical Industrial
-Zonacrono uses a high-energy, performance-oriented aesthetic that blends industrial elements with modern web design.
+ZonaCrono uses a high-energy, performance-oriented aesthetic that blends industrial elements with modern web design.
 
 ### Core Color Palette
 - **Primary**: `hsl(12 90% 50%)` (Racing Red/Orange) - Used for primary actions, accents, and branding.

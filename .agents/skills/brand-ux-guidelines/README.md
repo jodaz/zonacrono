@@ -1,10 +1,10 @@
 # Brand & UX Guidelines Skill
 
-This skill is designed to help maintaining the brand identity and user experience standards of the Zonacrono project.
+This skill is designed to help maintaining the brand identity and user experience standards of the ZonaCrono project.
 
 ## Installation
 
-This skill is automatically loaded when working within the Zonacrono project directory.
+This skill is automatically loaded when working within the ZonaCrono project directory.
 
 ## Usage
 
@@ -17,7 +17,7 @@ You can invoke this skill when:
 ### Example Trigger Phrases
 - "Apply brand styles to this component"
 - "Check if this layout follows UX guidelines"
-- "Use Zonacrono primary colors"
+- "Use ZonaCrono primary colors"
 
 ## Core Standards
 - **Primary Color**: #EA3814 (HSL 12 90% 50%)

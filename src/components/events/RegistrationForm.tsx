@@ -193,10 +193,11 @@ export function RegistrationForm({ event, activeStage, bcvRate, slug }: Registra
     return data.url;
   };
 
-  const onSubmit = async (withPayment: boolean) => {
+  const onSubmit = async () => {
     const values = form.getValues();
+    const isPaidEvent = activeStage.price_usd > 0;
     
-    if (withPayment && (!paymentFile || !values.payment_reference)) {
+    if (isPaidEvent && (!paymentFile || !values.payment_reference)) {
       toast.error("Por favor adjunta el comprobante y el número de referencia.");
       return;
     }
@@ -205,14 +206,14 @@ export function RegistrationForm({ event, activeStage, bcvRate, slug }: Registra
       setSubmitting(true);
       let receipt_url = "";
 
-      if (withPayment && paymentFile) {
+      if (isPaidEvent && paymentFile) {
         toast.info("Subiendo comprobante...");
         receipt_url = await uploadReceipt(paymentFile);
       }
 
       const payload = {
         ...values,
-        payment_data: withPayment ? {
+        payment_data: isPaidEvent ? {
           receipt_url,
           reference_number: values.payment_reference,
           amount_ves: parseFloat(((activeStage.price_usd || 0) * bcvRate).toFixed(2)),
@@ -482,105 +483,117 @@ ${event.payment_info.account_number ? `Cuenta: ${event.payment_info.account_numb
                   {submitting ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : null}
-                  {submitting ? "Validando..." : "Continuar al Pago"}
+                  {submitting ? "Validando..." : (activeStage.price_usd > 0 ? "Continuar al Pago" : "Continuar a Confirmación")}
                 </Button>
               </div>
             </div>
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               {/* Payment Details */}
-              <div className="border-2 border-black bg-card p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="mb-6 flex items-center gap-3">
-                  <CreditCard className="h-5 w-5 text-primary" />
-                  <h3 className="font-satoshi text-lg font-black uppercase tracking-wide text-foreground italic">
-                    Detalles de Pago
+              {activeStage.price_usd > 0 ? (
+                <div className="border-2 border-black bg-card p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="mb-6 flex items-center gap-3">
+                    <CreditCard className="h-5 w-5 text-primary" />
+                    <h3 className="font-satoshi text-lg font-black uppercase tracking-wide text-foreground italic">
+                      Detalles de Pago
+                    </h3>
+                  </div>
+
+                  <div className="grid gap-8 md:grid-cols-2">
+                    {/* Bank Info */}
+                    <div className="space-y-4">
+                      <div className="p-4 bg-muted/30 border-2 border-black relative group">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={handleCopyBankDetails}
+                          className="absolute top-2 right-2 h-7 w-7 rounded-none border-black hover:bg-primary hover:text-white transition-colors"
+                          title="Copiar datos"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                        <h4 className="font-mono text-[10px] uppercase font-bold text-muted-foreground mb-3 tracking-widest">Datos del Organizador</h4>
+                        <div className="space-y-2 font-mono text-xs text-balance pr-6">
+                          <p>
+                            <span className="text-muted-foreground uppercase">Banco:</span>{" "}
+                            <span className="font-bold">
+                              {event.payment_info?.bank_code && event.payment_info?.phone_number ? (
+                                <span className="text-primary mr-1">[{event.payment_info.bank_code}]</span>
+                              ) : null}
+                              {getBankName(event.payment_info?.bank_code) || event.payment_info?.bank_name || "No especificado"}
+                            </span>
+                          </p>
+                          <p><span className="text-muted-foreground uppercase">Teléfono:</span> <span className="font-bold">{event.payment_info?.phone_number || "No especificado"}</span></p>
+                          <p><span className="text-muted-foreground uppercase">Cédula:</span> <span className="font-bold">{event.payment_info?.id_number || "No especificada"}</span></p>
+                          {event.payment_info?.account_number && (
+                            <p><span className="text-muted-foreground uppercase">Cuenta:</span> <span className="font-bold break-all">{event.payment_info.account_number}</span></p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-6 border-2 border-black flex flex-col items-center justify-center gap-2 bg-primary/5">
+                        <span className="font-mono text-[10px] uppercase text-muted-foreground font-bold tracking-tighter">Monto a Reportar</span>
+                        <div className="flex flex-col items-center">
+                            <span className="text-4xl font-black italic text-primary">${activeStage.price_usd} USD</span>
+                            <span className="text-lg font-bold text-foreground">~ {priceVes} VES</span>
+                        </div>
+                        <span className="font-mono text-[9px] uppercase text-muted-foreground font-medium">Tasa BCV: {bcvRate} VES</span>
+                      </div>
+                    </div>
+
+                    {/* Proof of Payment */}
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="font-mono text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Comprobante (Imagen) *</Label>
+                        <div className="relative border-2 border-dashed border-black hover:border-primary/50 transition-colors p-8 text-center cursor-pointer group bg-muted/10">
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            onChange={(e) => setPaymentFile(e.target.files?.[0] || null)}
+                          />
+                          {paymentFile ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <CheckCircle className="h-8 w-8 text-primary" />
+                              <span className="text-xs font-bold truncate max-w-[200px] italic">{paymentFile.name}</span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <Upload className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                              <span className="text-[10px] uppercase font-mono font-bold text-muted-foreground">Subir Comprobante</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <FormInput
+                        control={form.control}
+                        name="payment_reference"
+                        label="Número de Referencia *"
+                        placeholder="Ej: 987654"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-8 p-4 bg-primary/5 border-2 border-primary flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                    <p className="text-[10px] font-black text-primary uppercase leading-relaxed tracking-tight">
+                      IMPORTANTE: Es obligatorio adjuntar el comprobante y la referencia de pago para completar tu inscripción.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-black bg-card p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center text-center">
+                  <CheckCircle className="h-16 w-16 text-primary mb-4" />
+                  <h3 className="font-satoshi text-2xl font-black uppercase tracking-wide text-foreground italic mb-2">
+                    Inscripción Gratuita
                   </h3>
-                </div>
-
-                <div className="grid gap-8 md:grid-cols-2">
-                  {/* Bank Info */}
-                  <div className="space-y-4">
-                    <div className="p-4 bg-muted/30 border-2 border-black relative group">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={handleCopyBankDetails}
-                        className="absolute top-2 right-2 h-7 w-7 rounded-none border-black hover:bg-primary hover:text-white transition-colors"
-                        title="Copiar datos"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                      <h4 className="font-mono text-[10px] uppercase font-bold text-muted-foreground mb-3 tracking-widest">Datos del Organizador</h4>
-                      <div className="space-y-2 font-mono text-xs text-balance pr-6">
-                        <p>
-                          <span className="text-muted-foreground uppercase">Banco:</span>{" "}
-                          <span className="font-bold">
-                            {event.payment_info?.bank_code && event.payment_info?.phone_number ? (
-                              <span className="text-primary mr-1">[{event.payment_info.bank_code}]</span>
-                            ) : null}
-                            {getBankName(event.payment_info?.bank_code) || event.payment_info?.bank_name || "No especificado"}
-                          </span>
-                        </p>
-                        <p><span className="text-muted-foreground uppercase">Teléfono:</span> <span className="font-bold">{event.payment_info?.phone_number || "No especificado"}</span></p>
-                        <p><span className="text-muted-foreground uppercase">Cédula:</span> <span className="font-bold">{event.payment_info?.id_number || "No especificada"}</span></p>
-                        {event.payment_info?.account_number && (
-                          <p><span className="text-muted-foreground uppercase">Cuenta:</span> <span className="font-bold break-all">{event.payment_info.account_number}</span></p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="p-6 border-2 border-black flex flex-col items-center justify-center gap-2 bg-primary/5">
-                      <span className="font-mono text-[10px] uppercase text-muted-foreground font-bold tracking-tighter">Monto a Reportar</span>
-                      <div className="flex flex-col items-center">
-                          <span className="text-4xl font-black italic text-primary">${activeStage.price_usd} USD</span>
-                          <span className="text-lg font-bold text-foreground">~ {priceVes} VES</span>
-                      </div>
-                      <span className="font-mono text-[9px] uppercase text-muted-foreground font-medium">Tasa BCV: {bcvRate} VES</span>
-                    </div>
-                  </div>
-
-                  {/* Proof of Payment */}
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="font-mono text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Comprobante (Imagen) *</Label>
-                      <div className="relative border-2 border-dashed border-black hover:border-primary/50 transition-colors p-8 text-center cursor-pointer group bg-muted/10">
-                        <input 
-                          type="file" 
-                          accept="image/*"
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          onChange={(e) => setPaymentFile(e.target.files?.[0] || null)}
-                        />
-                        {paymentFile ? (
-                          <div className="flex flex-col items-center gap-2">
-                            <CheckCircle className="h-8 w-8 text-primary" />
-                            <span className="text-xs font-bold truncate max-w-[200px] italic">{paymentFile.name}</span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2">
-                            <Upload className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
-                            <span className="text-[10px] uppercase font-mono font-bold text-muted-foreground">Subir Comprobante</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <FormInput
-                      control={form.control}
-                      name="payment_reference"
-                      label="Número de Referencia *"
-                      placeholder="Ej: 987654"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-8 p-4 bg-red-50 border-2 border-red-600 flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-                  <p className="text-[10px] font-black text-red-700 uppercase leading-relaxed tracking-tight">
-                    IMPORTANTE: Tienes hasta las 11:59 PM de hoy para reportar tu pago o esta reserva será cancelada automáticamente.
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Esta etapa del evento es gratuita. No necesitas realizar ningún pago. Haz clic en completar para confirmar tu participación.
                   </p>
                 </div>
-              </div>
+              )}
 
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
                 <Button 
@@ -596,16 +609,7 @@ ${event.payment_info.account_number ? `Cuenta: ${event.payment_info.account_numb
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
                   <Button 
                     type="button"
-                    variant="outline"
-                    onClick={() => onSubmit(false)}
-                    disabled={submitting}
-                    className="rounded-none border-2 border-black font-black uppercase text-xs italic py-6 px-6 hover:bg-muted transition-all"
-                  >
-                    RESERVAR Y PAGAR LUEGO
-                  </Button>
-                  <Button 
-                    type="button"
-                    onClick={() => onSubmit(true)}
+                    onClick={() => onSubmit()}
                     disabled={submitting}
                     className="rounded-none border-2 border-black bg-primary text-white font-black uppercase text-xs italic py-6 px-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all h-auto"
                   >
@@ -614,7 +618,7 @@ ${event.payment_info.account_number ? `Cuenta: ${event.payment_info.account_numb
                     ) : (
                       <CheckCircle className="h-4 w-4 mr-2" />
                     )}
-                    REPORTAR PAGO AHORA
+                    {activeStage.price_usd > 0 ? "INSCRIBIRSE Y REPORTAR PAGO" : "COMPLETAR INSCRIPCIÓN"}
                   </Button>
                 </div>
               </div>

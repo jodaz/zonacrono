@@ -1,15 +1,15 @@
 ---
 name: zonacrono-dev-guide
-description: Master patterns for Zonacrono: Database-driven events, root-level routing, and internal API integration.
+description: Master patterns for ZonaCrono: Database-driven events, root-level routing, and internal API integration.
 ---
 
-# Zonacrono Development Guide
+# ZonaCrono Development Guide
 
-This skill provides the core architectural patterns and development standards for the Zonacrono project. Use this skill when adding new events, refactoring data fetching, or modifying route structures.
+This skill provides the core architectural patterns and development standards for the ZonaCrono project. Use this skill when adding new events, refactoring data fetching, or modifying route structures.
 
 ## 1. Database-Driven Events
 
-Zonacrono uses a database-driven approach for all events. All event data is stored in Supabase.
+ZonaCrono uses a database-driven approach for all events. All event data is stored in Supabase.
 
 ### Core Tables
 - **`events`**: Main event information (name, slug, date, description, banners).
@@ -26,7 +26,7 @@ New events are created via the Dashboard or directly in the `events` table in Su
 
 ## 2. Routing Strategy
 
-Zonacrono uses a root-level slug pattern for events: `zonacrono.com/[event]`.
+ZonaCrono uses a root-level slug pattern for events: `zonacrono.com/[event]`.
 
 - **Implementation**: Handled in `src/app/[event]/page.tsx`.
 - **Precedence**: Static routes (like `/login`, `/dashboard`, `/api`) take precedence over dynamic routes.
@@ -140,14 +140,14 @@ const { data, error } = await supabase
 
 ## 8. Telegram Bot Integration (Secondary)
 
-Zonacrono uses a Telegram Bot for real-time manager alerts.
+ZonaCrono uses a Telegram Bot for real-time manager alerts.
 - **Library**: Use **`telegraf`**.
 - **Formatting**: Always use **`MarkdownV2`** with `escapeMarkdown`.
 - **Status**: Currently treated as a secondary notification channel.
 
 ## 9. Email Notifications (Primary)
 
-Zonacrono uses **Resend** for all critical athlete communications.
+ZonaCrono uses **Resend** for all critical athlete communications.
 
 ### Core Principles
 - **Library**: Use **`resend`** for API interactions.
@@ -174,7 +174,7 @@ await sendRegistrationEmail({
 
 ## 10. Environment Configuration
 
-Zonacrono uses a centralized environment variable management pattern to ensure type safety and consistent defaults across the codebase.
+ZonaCrono uses a centralized environment variable management pattern to ensure type safety and consistent defaults across the codebase.
 
 - **Centralized Export**: All environment variables must be exported from **`src/lib/env.ts`** via a single `env` object.
 - **Import Pattern**: Always import `env` from `@/lib/env` instead of using `process.env` directly.

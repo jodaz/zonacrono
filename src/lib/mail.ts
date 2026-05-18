@@ -5,6 +5,7 @@ import { ReservationConfirmedEmail } from '@/components/emails/ReservationConfir
 import { PaymentReportedEmail } from '@/components/emails/PaymentReported';
 import { PaymentRejectedEmail } from '@/components/emails/PaymentRejected';
 import { RegistrationApprovedEmail } from '@/components/emails/RegistrationApproved';
+import { PaymentReportedOrganizerEmail } from '@/components/emails/PaymentReportedOrganizer';
 
 
 let _resend: Resend | null = null;
@@ -181,6 +182,46 @@ export async function sendRegistrationApprovedEmail(
     console.error('[Mail] Resend error (RegistrationApproved):', error);
   } else {
     console.log('[Mail] Resend success (RegistrationApproved)');
+  }
+
+  return { error };
+}
+
+/**
+ * Flow (Report): Payment reported notification for organizer
+ */
+export async function sendPaymentReportedOrganizerEmail(
+  organizer: { name: string; email: string },
+  athlete: AthleteInfo,
+  event: EventInfo,
+  payment: {
+    amountUsd?: number;
+    amountVes?: number;
+    referenceNumber: string;
+  }
+) {
+  const dashboardUrl = `${env.NEXT_PUBLIC_APP_URL}/dashboard/payments`;
+
+  console.log(`[Mail] Attempting to send PaymentReportedOrganizer email to: ${organizer.email}`);
+  const { error } = await getResend().emails.send({
+    from: FROM_ADDRESS,
+    to: organizer.email,
+    subject: `💰 Nuevo pago reportado — ${event.name}`,
+    react: PaymentReportedOrganizerEmail({
+      organizerName: organizer.name,
+      athleteName: `${athlete.firstName} ${athlete.lastName}`,
+      eventName: event.name,
+      amountUsd: payment.amountUsd,
+      amountVes: payment.amountVes,
+      referenceNumber: payment.referenceNumber,
+      dashboardUrl,
+    }),
+  });
+
+  if (error) {
+    console.error('[Mail] Resend error (PaymentReportedOrganizer):', error);
+  } else {
+    console.log('[Mail] Resend success (PaymentReportedOrganizer)');
   }
 
   return { error };
