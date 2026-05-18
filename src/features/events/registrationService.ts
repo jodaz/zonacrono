@@ -4,6 +4,7 @@ import {
   sendRegistrationReceivedEmail, 
   sendReservationConfirmedEmail, 
   sendPaymentReportedEmail,
+  sendPaymentReportedOrganizerEmail,
   sendPaymentRejectedEmail,
   sendRegistrationApprovedEmail 
 } from '@/lib/mail';
@@ -119,7 +120,7 @@ export const registrationService = {
     // 1. Fetch Event Info
     const { data: eventData } = await supabaseAdmin
       .from('events')
-      .select('name, slug, manager_id, managers(telegram_chat_id, telegram_notifications_enabled)')
+      .select('name, slug, manager_id, managers(name, email, telegram_chat_id, telegram_notifications_enabled)')
       .eq('id', data.event_id)
       .single();
 
@@ -149,6 +150,23 @@ export const registrationService = {
       console.log(`[RegistrationService] Sending email to ${athleteInfo.email} (Payment data: ${!!data.payment_data})`);
       if (data.payment_data) {
         await sendRegistrationReceivedEmail(athleteInfo, eventInfo, registrationId);
+
+        if (manager && manager.email) {
+          console.log(`[RegistrationService] Sending organizer email to ${manager.email}`);
+          await sendPaymentReportedOrganizerEmail(
+            {
+              name: manager.name,
+              email: manager.email,
+            },
+            athleteInfo,
+            eventInfo,
+            {
+              amountUsd: data.payment_data.amount_usd,
+              amountVes: data.payment_data.amount_ves,
+              referenceNumber: data.payment_data.reference_number || 'N/A',
+            }
+          );
+        }
       } else {
         console.log(`[RegistrationService] Calling sendReservationConfirmedEmail for ${registrationId}`);
         await sendReservationConfirmedEmail(athleteInfo, eventInfo, registrationId);
@@ -176,7 +194,7 @@ export const registrationService = {
     // 1. Fetch the registration and validate it's PENDING
     const { data: registration, error: fetchError } = await supabaseAdmin
       .from('registrations')
-      .select('id, status, first_name, last_name, email, event_id, events(name, slug)')
+      .select('id, status, first_name, last_name, email, event_id, events(name, slug, managers(name, email))')
       .eq('id', registrationId)
       .single();
 
@@ -265,6 +283,29 @@ export const registrationService = {
         },
         registrationId
       ).catch((err) => console.error('Email send error:', err));
+
+      if (event.managers && event.managers.email) {
+        sendPaymentReportedOrganizerEmail(
+          {
+            name: event.managers.name,
+            email: event.managers.email,
+          },
+          {
+            email: registration.email,
+            firstName: registration.first_name,
+            lastName: registration.last_name,
+          },
+          {
+            name: event.name,
+            slug: event.slug,
+          },
+          {
+            amountUsd: paymentData.amountUsd,
+            amountVes: paymentData.amountVes,
+            referenceNumber: paymentData.referenceNumber,
+          }
+        ).catch((err) => console.error('Organizer email send error:', err));
+      }
     }
 
     return true;

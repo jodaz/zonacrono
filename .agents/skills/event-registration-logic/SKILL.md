@@ -5,7 +5,7 @@ description: Guides the implementation of dual-path athlete registration and pay
 
 # Event Registration Logic & Email Notifications
 
-This skill manages the two primary registration and payment reporting flows for athletes in the Zonacrono platform, with a primary focus on automated email communication via **Resend**.
+This skill manages the two primary registration and payment reporting flows for athletes in the ZonaCrono platform, with a primary focus on automated email communication via **Resend**.
 
 ## 1. Flow 1: Immediate Registration and Report (Ideal Path)
 

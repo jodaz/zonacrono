@@ -1,6 +1,6 @@
 # Event Registration Logic Skill
 
-This skill provides the logic and state transition rules for managing athlete registrations in the Zonacrono platform.
+This skill provides the logic and state transition rules for managing athlete registrations in the ZonaCrono platform.
 
 ## Overview
 
