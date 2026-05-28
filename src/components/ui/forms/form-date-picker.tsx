@@ -46,9 +46,9 @@ export function FormDatePicker<TFieldValues extends FieldValues, TName extends F
         // Parse current value (could be YYYY-MM-DD string or Date object)
         const dateValue = React.useMemo(() => {
           if (!field.value) return undefined;
-          if (field.value instanceof Date) return field.value;
+          if ((field.value as any) instanceof Date) return field.value;
           if (typeof field.value === "string") {
-            return parseEventDate(field.value);
+            return parseEventDate(field.value) ?? undefined;
           }
           return undefined;
         }, [field.value]);

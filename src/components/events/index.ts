@@ -15,3 +15,4 @@ export * from './EventCard';
 export * from './RulesSection';
 export * from './StickyNav';
 export * from './types';
+export * from './StravaRouteEmbed';

@@ -51,7 +51,12 @@ const configSchema = z.object({
   banner_url: z.string().url('URL inválida').or(z.literal('')).optional(),
   route_image_url: z.string().url('URL inválida').or(z.literal('')).optional(),
   route_description: z.string().optional(),
-  strava_url: z.string().url('URL inválida').or(z.literal('')).optional(),
+  strava_url: z.string()
+    .refine((val) => !val || /^\d+$/.test(val.trim()) || val.trim().includes('strava.com/routes/'), {
+      message: 'Debe ser un ID de Strava numérico (ej. 31234567) o una URL de ruta'
+    })
+    .or(z.literal(''))
+    .optional(),
   social_media: z.object({
     instagram: z.string().url('URL inválida').or(z.literal('')).optional(),
     facebook: z.string().url('URL inválida').or(z.literal('')).optional(),

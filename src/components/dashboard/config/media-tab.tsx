@@ -50,7 +50,9 @@ export function MediaTab({ eventId }: MediaTabProps) {
           <FormInput
             control={control}
             name="strava_url"
-            label="Link de Strava"
+            label="ID de Ruta de Strava"
+            placeholder="Ej: 31234567"
+            description="El identificador numérico de la ruta en Strava para poder embeberla y enlazarla."
           />
         </div>
 

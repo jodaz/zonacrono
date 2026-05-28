@@ -4,6 +4,7 @@ import { SplitText } from "@/components/ui";
 import { MapPin, Droplet, Trophy, Medal, Shirt, Award, Tag, Gift, Utensils } from "lucide-react";
 import Image from "next/image";
 import { TenantData } from "@/types";
+import { StravaRouteEmbed } from "./StravaRouteEmbed";
 
 interface EventDetailsSectionProps {
   data: TenantData;
@@ -13,10 +14,22 @@ const iconMap: Record<string, any> = {
   Shirt, Tag, Award, Utensils, Gift, Medal, Trophy, Droplet, MapPin
 };
 
+const getStravaRouteId = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  console.log(trimmed);
+  if (/^\d+$/.test(trimmed)) return trimmed;
+  const match = trimmed.match(/routes\/(\d+)/);
+  return match ? match[1] : null;
+};
+
 export function EventDetailsSection({ data }: EventDetailsSectionProps) {
     const details = data.eventDetails;
     if (!details) return null;
 
+    const stravaUrl = details.route?.stravaLinks?.[0]?.url;
+    const stravaRouteId = getStravaRouteId(stravaUrl);
+    console.log("hola");
     return (
         <section className="bg-charcoal relative overflow-hidden text-white">
             {/* Decorative ember scribbles */}
@@ -64,32 +77,42 @@ export function EventDetailsSection({ data }: EventDetailsSectionProps) {
                                         <div className="text-left">
                                             <p className="font-satoshi font-black uppercase italic mb-1">Mapa Interactivo</p>
                                             <div className="flex flex-col gap-1 text-left">
-                                                {details.route.stravaLinks.map((link, i) => (
-                                                    <a 
-                                                        key={i}
-                                                        href={link.url} 
-                                                        className="text-ember hover:text-white underline font-mono text-sm text-left transition-colors"
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                    >
-                                                        {link.label} →
-                                                    </a>
-                                                ))}
+                                                 {details.route.stravaLinks.map((link, i) => {
+                                                     const routeId = getStravaRouteId(link.url);
+                                                     const hrefUrl = routeId ? `https://www.strava.com/routes/${routeId}` : link.url;
+                                                     return (
+                                                         <a 
+                                                             key={i}
+                                                             href={hrefUrl} 
+                                                             className="text-ember hover:text-white underline font-mono text-sm text-left transition-colors"
+                                                             target="_blank"
+                                                             rel="noopener noreferrer"
+                                                         >
+                                                             {link.label} →
+                                                         </a>
+                                                     );
+                                                 })}
                                             </div>
                                         </div>
                                     </div>
                                   )}
                               </div>
                               
-                              <div className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg rounded-none p-4 w-full">
-                                  <Image
-                                      src={details.route.image}
-                                      alt="Mapa de la ruta"
-                                      width={800}
-                                      height={600}
-                                      className="w-full h-auto rounded-none object-contain"
-                                  />
-                              </div>
+                              {(stravaRouteId || details.route.image) && (
+                                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg rounded-none p-4 w-full">
+                                      {stravaRouteId ? (
+                                          <StravaRouteEmbed routeId={stravaRouteId} />
+                                      ) : (
+                                          <Image
+                                              src={details.route.image}
+                                              alt="Mapa de la ruta"
+                                              width={800}
+                                              height={600}
+                                              className="w-full h-auto rounded-none object-contain"
+                                          />
+                                      )}
+                                  </div>
+                              )}
                           </div>
                       </div>
                   </div>

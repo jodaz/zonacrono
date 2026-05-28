@@ -94,7 +94,12 @@ export default async function EventPage({ params }: EventPageProps) {
         title: "Ruta del Evento",
         description: event.route_description || "Mapa oficial de la ruta.",
         image: event.route_image_url || '',
-        stravaLinks: event.strava_url ? [{ label: "Segmento Strava", url: event.strava_url }] : []
+        stravaLinks: event.strava_url ? [{ 
+          label: "Segmento Strava", 
+          url: /^\d+$/.test(event.strava_url.trim()) 
+            ? `https://www.strava.com/routes/${event.strava_url.trim()}` 
+            : event.strava_url.trim() 
+        }] : []
       },
       categories: event.categories?.map((cat: any) => ({
         name: cat.name,
