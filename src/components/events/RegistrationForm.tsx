@@ -32,12 +32,11 @@ import {
   FormMessage,
   Logo
 } from "@/components/ui";
-import { FormInput } from "@/components/ui/forms";
+import { FormInput, FormSelect, FormDatePicker } from "@/components/ui/forms";
 import { toast } from "sonner";
 import { registrationSchema, type Registration } from "@/features/events/schemas";
 import { getBankByCode, getBankName } from "@/lib/banks";
 import { VENEZUELA_STATES, VENEZUELA_CITIES_BY_STATE } from "@/lib/venezuela";
-import { FormSelect } from "@/components/ui/forms";
 
 const BLOOD_TYPES = [
   { value: "O+", label: "O+" },
@@ -340,12 +339,11 @@ ${event.payment_info.account_number ? `Cuenta: ${event.payment_info.account_numb
                     placeholder="juan@email.com"
                   />
                   
-                  <FormInput
+                  <FormDatePicker
                     control={form.control}
                     name="birth_date"
                     label="Fecha de Nacimiento *"
-                    type="date"
-                    max={maxBirthDateStr}
+                    disabledDays={(date) => date > maxBirthDate}
                   />
 
                   <FormField

@@ -77,7 +77,7 @@ export function PaymentDrawer({ registration, isOpen, onClose, eventId }: Paymen
               {statusConfig.label}
             </Badge>
             <span className="font-mono text-[10px] uppercase text-muted-foreground">
-              {format(new Date(registration.created_at), "dd/MM/yy")}
+              {format(new Date(registration.created_at), "dd-MM-yyyy")}
             </span>
           </div>
           <SheetTitle className="text-2xl font-black uppercase italic tracking-tighter">

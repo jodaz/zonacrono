@@ -5,7 +5,7 @@ import { CalendarDays, MapPin, Clock, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isValid, isBefore } from "date-fns";
 import type { EventData } from "./types";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatEventDate } from "@/lib/utils";
 
 interface HeroSectionProps {
   event?: EventData;
@@ -113,10 +113,7 @@ export const EventHero = ({ event, countdownTarget }: HeroSectionProps) => {
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-white/70 font-satoshi text-base sm:text-lg mb-10">
             <span className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4 sm:w-5 sm:h-5 text-ember" />
-              {event?.date ? (() => {
-                const { day, month, year } = formatDate(event.date);
-                return `${day} ${month} ${year}`;
-              })() : "Fecha por confirmar"}
+              {event?.date ? formatEventDate(event.date, 'text') : "Fecha por confirmar"}
             </span>
             <span className="flex items-center gap-2">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-ember" />

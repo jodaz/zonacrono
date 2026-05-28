@@ -16,7 +16,7 @@ import {
   Form
 } from "@/components/ui";
 import { Loader2, Plus } from "lucide-react";
-import { FormInput, FormSelect, FormCombobox } from "@/components/ui/forms";
+import { FormInput, FormSelect, FormCombobox, FormDatePicker } from "@/components/ui/forms";
 import { useProvisionEvent } from "@/hooks/queries/useEvents";
 import { toast } from "sonner";
 import { VENEZUELA_CITIES } from "@/lib";
@@ -142,11 +142,10 @@ export function CreateEventDialog({ managers, trigger }: CreateEventDialogProps)
               />
               
               <div className="grid grid-cols-2 gap-4">
-                <FormInput
+                <FormDatePicker
                   control={form.control}
                   name="event_date"
                   label="Fecha"
-                  type="date"
                 />
                 <FormInput
                   control={form.control}

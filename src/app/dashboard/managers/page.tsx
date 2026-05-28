@@ -302,7 +302,7 @@ export default function ManagersPage() {
                       )}
                     </TableCell>
                     <TableCell className="py-5 px-6 font-mono text-xs font-bold whitespace-nowrap">
-                      {manager.created_at ? format(new Date(manager.created_at), "dd/MM/yyyy · HH:mm", { locale: es }) : 'N/A'}
+                      {manager.created_at ? format(new Date(manager.created_at), "dd-MM-yyyy · HH:mm") : 'N/A'}
                     </TableCell>
                     <TableCell className="text-right py-5 px-6">
                       <DropdownMenu>

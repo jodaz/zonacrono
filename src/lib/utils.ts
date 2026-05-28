@@ -9,10 +9,20 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Parses an event date string into a Date object.
- * Handles both ISO formats (YYYY-MM-DD) and Spanish formats (DD de mes de YYYY).
+ * Handles both ISO formats (YYYY-MM-DD) in local time, general ISO timestamps, and Spanish formats.
  */
 export function parseEventDate(dateStr: string): Date | null {
   if (!dateStr) return null;
+
+  // Try parsing YYYY-MM-DD in local time to avoid timezone offset subtracting 1 day
+  const yyyymmddMatch = dateStr.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (yyyymmddMatch) {
+    const year = parseInt(yyyymmddMatch[1], 10);
+    const month = parseInt(yyyymmddMatch[2], 10) - 1; // 0-indexed
+    const day = parseInt(yyyymmddMatch[3], 10);
+    const date = new Date(year, month, day);
+    if (isValid(date)) return date;
+  }
 
   // Try standard ISO parsing
   const date = new Date(dateStr);
@@ -49,6 +59,29 @@ export function formatDate(dateStr: string) {
     };
   } catch (e) {
     return { day: "??", month: "???", year: "????" };
+  }
+}
+
+/**
+ * Formats a date string into Venezuelan format:
+ * - 'numeric': dd-MM-yyyy (e.g. 21-05-2026)
+ * - 'text': dd month_abbreviation year (e.g. 21 may. 2026)
+ */
+export function formatEventDate(dateStr: string, pattern: 'numeric' | 'text' = 'numeric'): string {
+  const d = parseEventDate(dateStr);
+  
+  if (!d || !isValid(d)) {
+    return "Fecha por confirmar";
+  }
+
+  try {
+    if (pattern === 'numeric') {
+      return format(d, "dd-MM-yyyy");
+    } else {
+      return format(d, "dd MMM yyyy", { locale: es }).toLowerCase();
+    }
+  } catch (e) {
+    return "Fecha por confirmar";
   }
 }
 /**

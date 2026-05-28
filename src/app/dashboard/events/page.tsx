@@ -13,7 +13,7 @@ import {
 } from '@/components/ui';
 import { Button, Input } from '@/components/ui';
 import { useAuthStore } from '@/store';
-import { cn } from '@/lib';
+import { cn, formatEventDate } from '@/lib';
 import { useAdminEvents } from '@/hooks/queries/useEvents';
 import { CreateEventDialog } from '@/components/dashboard/create-event-dialog';
 import { 
@@ -201,7 +201,7 @@ export default function EventsPage() {
                     <div className="flex flex-col gap-1 font-mono text-[11px]">
                       <div className="flex items-center text-muted-foreground">
                         <Calendar className="w-3 h-3 mr-1.5 text-primary" />
-                        {format(new Date(event.event_date), 'dd MMM, yyyy', { locale: es })}
+                        {formatEventDate(event.event_date, 'numeric')}
                       </div>
                       <div className="flex items-center text-muted-foreground">
                         <Clock className="w-3 h-3 mr-1.5 text-primary" />
