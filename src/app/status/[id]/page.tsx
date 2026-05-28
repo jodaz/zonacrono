@@ -223,7 +223,7 @@ export default async function RegistrationStatusPage({ params }: StatusPageProps
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] uppercase text-muted-foreground font-bold">Fecha Reporte</span>
-                  <span className="font-bold text-foreground">{format(new Date(registration.payment.reported_at), "dd/MM/yyyy HH:mm", { locale: es })}</span>
+                  <span className="font-bold text-foreground">{format(new Date(registration.payment.reported_at), "dd-MM-yyyy HH:mm")}</span>
                 </div>
               </div>
             </div>

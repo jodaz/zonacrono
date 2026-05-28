@@ -5,4 +5,5 @@ export * from './form-select';
 export * from './form-switch';
 export * from './form-file-uploader';
 export * from './form-combobox';
+export * from './form-date-picker';
 export * from './types';

@@ -208,7 +208,7 @@ export function RegistrationManagement({ eventId }: RegistrationManagementProps)
                   </TableCell>
                   <TableCell>{getStatusBadge(reg.status)}</TableCell>
                   <TableCell className="text-xs font-mono text-foreground">
-                    {format(new Date(reg.created_at), "dd/MM/yy")}
+                    {format(new Date(reg.created_at), "dd-MM-yyyy")}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -292,7 +292,7 @@ export function RegistrationManagement({ eventId }: RegistrationManagementProps)
                   <div className="font-mono text-xs bg-muted/30 p-4 border-2 border-black dark:border-white space-y-2">
                     <p><span className="text-muted-foreground uppercase">Referencia:</span> <span className="font-bold text-primary">#{selectedReg.payment.reference_number}</span></p>
                     <p><span className="text-muted-foreground uppercase">Monto:</span> <span className="font-bold text-foreground">${selectedReg.payment.amount_usd} / {selectedReg.payment.amount_ves} VES</span></p>
-                    <p><span className="text-muted-foreground uppercase">Reportado:</span> <span className="font-bold text-foreground">{selectedReg.payment.reported_at ? format(new Date(selectedReg.payment.reported_at), "dd/MM/yy HH:mm", { locale: es }) : "N/A"}</span></p>
+                    <p><span className="text-muted-foreground uppercase">Reportado:</span> <span className="font-bold text-foreground">{selectedReg.payment.reported_at ? format(new Date(selectedReg.payment.reported_at), "dd-MM-yyyy HH:mm") : "N/A"}</span></p>
                   </div>
                   <a 
                     href={selectedReg.payment.receipt_url} 

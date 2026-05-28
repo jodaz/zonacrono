@@ -2,7 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
-import { FormInput, FormTextarea, FormSelect, FormCombobox, FormFileUploader } from "@/components/ui/forms";
+import { FormInput, FormTextarea, FormSelect, FormCombobox, FormFileUploader, FormDatePicker } from "@/components/ui/forms";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Input } from "../../ui";
 import { VENEZUELA_CITIES } from "@/lib";
 
@@ -67,11 +67,10 @@ export function GeneralTab({ managers, onSlugify }: GeneralTabProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FormInput
+          <FormDatePicker
             control={control}
             name="event_date"
             label="Fecha"
-            type="date"
           />
           <FormInput
             control={control}

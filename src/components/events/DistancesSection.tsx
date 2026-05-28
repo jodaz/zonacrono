@@ -1,6 +1,7 @@
 import { Card, CardContent, Button, AnimatedContent, Badge } from "@/components/ui";
 import { Route, Map } from "lucide-react";
 import type { EventData, Distance } from "./types";
+import { StravaRouteEmbed } from "./StravaRouteEmbed";
 
 interface DistancesSectionProps {
   event?: EventData;
@@ -31,6 +32,22 @@ export const DistancesSection = ({
   organization
 }: DistancesSectionProps) => {
   const eventLogo = logoUrl || organization?.logo_url;
+  
+  // Extract route ID from numeric string or full Strava route URL
+  const extractStravaRouteId = (input?: string) => {
+    if (!input) return null;
+    const trimmed = input.trim();
+    if (/^\d+$/.test(trimmed)) {
+      return trimmed;
+    }
+    const match = trimmed.match(/\/routes\/(\d+)/);
+    return match ? match[1] : null;
+  };
+
+  const stravaRouteId = extractStravaRouteId(stravaUrl);
+  const stravaLinkUrl = stravaRouteId 
+    ? `https://www.strava.com/routes/${stravaRouteId}` 
+    : (stravaUrl && stravaUrl.trim().startsWith('http') ? stravaUrl.trim() : null);
 
   return (
     <div className="relative overflow-hidden bg-background">
@@ -232,7 +249,9 @@ export const DistancesSection = ({
 
           <div className="max-w-4xl mx-auto">
             <AnimatedContent delay={0.2} distance={50}>
-              {routeMapUrl ? (
+              {stravaRouteId ? (
+                <StravaRouteEmbed routeId={stravaRouteId} />
+              ) : routeMapUrl ? (
                 <img src={routeMapUrl} alt="Mapa de la ruta" className="w-full rounded-none border border-border" />
               ) : (
                 <div className="aspect-video bg-secondary rounded-none border border-border flex items-center justify-center">
@@ -246,7 +265,7 @@ export const DistancesSection = ({
               )}
             </AnimatedContent>
 
-            {stravaUrl && (
+            {stravaLinkUrl && (
               <AnimatedContent delay={0.4} distance={20}>
                 <div className="mt-6 text-center">
                   <Button
@@ -255,7 +274,7 @@ export const DistancesSection = ({
                     className="border-ember text-ember hover:bg-ember hover:text-white transition-all bg-transparent"
                     style={{ boxShadow: '4px 4px 0px 0px hsl(14 78% 57%)' }}
                   >
-                    <a href={stravaUrl} target="_blank" rel="noopener noreferrer">
+                    <a href={stravaLinkUrl} target="_blank" rel="noopener noreferrer">
                       Ver en Strava
                     </a>
                   </Button>
